@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday!</title>
+    <style>
+        body {
+            margin: 0; padding: 0;
+            background-color: #ffe6eb;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Envelope Styles */
+        #envelope-screen {
+            text-align: center;
+            cursor: pointer;
+            transition: opacity 1s ease-out;
+        }
+        .envelope {
+            width: 250px; height: 150px;
+            background-color: #ffb6c1;
+            position: relative;
+            margin: 0 auto;
+            border-radius: 5px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 50px;
+            border: 2px dashed #ff69b4;
+        }
+        .tap-text { margin-top: 20px; color: #ff69b4; font-weight: bold; font-size: 18px; }
+
+        /* Pages Container */
+        #pages-container {
+            display: none;
+            width: 90%; max-width: 400px;
+            height: 80vh;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* Page 1 Styles */
+        #page1 {
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            height: 100%;
+        }
+        .wish-text {
+            font-size: 24px; color: #ff1493;
+            line-height: 1.5; padding: 20px;
+            font-weight: bold;
+        }
+        .turn-btn {
+            margin-top: 30px; padding: 12px 25px;
+            background-color: #ff69b4; color: white;
+            border: none; border-radius: 25px;
+            font-size: 16px; cursor: pointer;
+            box-shadow: 0 5px 15px rgba(255,105,180,0.4);
+        }
+
+        /* Page 2 Styles */
+        #page2 {
+            display: none; flex-direction: column;
+            align-items: center; height: 100%;
+        }
+        .photo-frame {
+            width: 200px; height: 200px;
+            border: 5px solid #ffb6c1; border-radius: 10px;
+            margin-top: 20px; overflow: hidden;
+        }
+        .photo-frame img { width: 100%; height: 100%; object-fit: cover; }
+        .cake-container { font-size: 80px; margin-top: 20px; transition: 0.5s; }
+        .blow-text { font-size: 20px; color: #ff1493; font-weight: bold; margin-top: 10px; }
+
+        /* Balloons Animation */
+        .balloon {
+            position: absolute;
+            font-size: 40px;
+            top: -100px;
+            animation: fall linear forwards;
+            z-index: 100;
+        }
+        @keyframes fall {
+            to { top: 110vh; }
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="bday-song" src="song.mp3" loop></audio>
+
+    <div id="envelope-screen" onclick="openEnvelope()">
+        <div class="envelope">
+            🌸💌🌸
+        </div>
+        <div class="tap-text">Tap to Open</div>
+    </div>
+
+    <div id="pages-container">
+        
+        <div id="page1">
+            <div class="wish-text">
+                "Wishing you a day filled with happiness and a year filled with joy.<br><br>Have a wonderful birthday!"
+            </div>
+            <button class="turn-btn" onclick="turnPage()">Turn Page ➔</button>
+        </div>
+
+        <div id="page2">
+            <div class="photo-frame">
+                <img src="photo.jpg" alt="Birthday Photo">
+            </div>
+            
+            <div class="cake-container" id="cake">🎂</div>
+            <div class="blow-text" id="blow-inst">Blow the candles...</div>
+        </div>
+
+    </div>
+
+    <script>
+        let bgAudio = document.getElementById('bday-song');
+
+        function openEnvelope() {
+            // Unlocking audio for iOS on first tap
+            bgAudio.play().catch(() => {});
+            bgAudio.pause();
+
+            // Hide Envelope, Show Pages
+            document.getElementById('envelope-screen').style.display = 'none';
+            document.getElementById('pages-container').style.display = 'block';
+        }
+
+        function turnPage() {
+            // Hide Page 1, Show Page 2
+            document.getElementById('page1').style.display = 'none';
+            document.getElementById('page2').style.display = 'flex';
+
+            // Start 5-second timer for the candle
+            setTimeout(() => {
+                blowOutCandle();
+            }, 5000);
+        }
+
+        function blowOutCandle() {
+            // Change cake with candle to cake without candle (or cupcake)
+            document.getElementById('cake').innerText = '🍰'; 
+            document.getElementById('blow-inst').innerText = 'Happy Birthday!! 🎉';
+            
+            // Play Song
+            bgAudio.currentTime = 0;
+            bgAudio.play();
+
+            // Start Balloons Drop
+            createBalloons();
+        }
+
+        function createBalloons() {
+            const colors = ['🎈', '🎊', '🎀', '🎁', '🎈'];
+            let count = 0;
+            
+            // Drop a new balloon every 100 milliseconds
+            let interval = setInterval(() => {
+                let balloon = document.createElement('div');
+                balloon.className = 'balloon';
+                balloon.innerText = colors[Math.floor(Math.random() * colors.length)];
+                balloon.style.left = Math.random() * 90 + 'vw';
+                balloon.style.animationDuration = (Math.random() * 2 + 3) + 's'; // Fall speed between 3-5s
+                
+                document.body.appendChild(balloon);
+                count++;
+
+                // Stop generating after 150 items to cover screen but not crash browser
+                if(count > 150) {
+                    clearInterval(interval);
+                }
+            }, 100);
+        }
+    </script>
+</body>
+</html>
